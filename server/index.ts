@@ -1,4 +1,5 @@
 import express from 'express';
+import { env } from 'process';
 
 const app = express();
 const port = 3333;
@@ -7,9 +8,14 @@ var base = [
   {"name": "Luis Florez"
 },
   {"name": "David Castaño"},{"name": "Joel Arias"}];
-app.get("/api", (req, res) => {
-  res.json({users: base});
+app.get('/api', (req, res) => {
+ res.send(base);
 });
+
+/* app.get('/api:id', (req, res) => {
+  res.send(base);
+ }); */
+
 
 
 /* var fs = require('fs');

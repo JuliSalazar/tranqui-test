@@ -1,26 +1,33 @@
-import { Container, CssBaseline, Paper, Typography, ButtonGroup, Button  } from '@mui/material';
+import { Container, CssBaseline, Paper, Typography, ButtonGroup, Button } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { useEffect } from 'react';
 
-
-/* window.onload = (event) => {
+window.onload = (event) => {
   console.log('The page has fully loaded');
 };
- */
-const buttons = [
-  <Button key="one">One</Button>,
-  <Button key="two">Two</Button>,
-  <Button key="three">Three</Button>,
-];
 
 function App() {
-  useEffect(() => {
-    fetch('http://localhost:3000/api')
-    .then(res => {
-        console.log(res.json());
-    })
 
+  const [initialNames, setInitialNames] = React.useState([]);
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      const response = await fetch('/api');
+      let json = await response.text();
+      let array = JSON.parse(json);
+      setInitialNames(array);
+    };
+    loadInitialData();
   }, []);
+  const sendData = async () => {
+    const request = await fetch('/api', {
+      method: 'POST',
+      body: JSON.stringify({ name: 'kitten'})
+    });
+  };
+  const handleClick = () => {
+  sendData();
+  }
 
   return (<>
     <CssBaseline />
@@ -33,8 +40,12 @@ function App() {
               orientation="vertical"
               aria-label="vertical outlined button group"
             >
-              {buttons}
+        
+              {initialNames.map(({ name }) => {
+                return <Button key={name} formMethod="POST" onClick={handleClick}>{name}</Button>
+              })}
             </ButtonGroup>
+          
           </Box>
         </Paper>
       </Container>
