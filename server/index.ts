@@ -1,22 +1,28 @@
 import express from 'express';
-import { env } from 'process';
 
 const app = express();
 const port = 3333;
+const bp = require('body-parser');
+app.use(bp.json());
+app.use(bp.urlencoded({ extended: true }));
 
 var base = [
-  {"name": "Luis Florez"
-},
-  {"name": "David Castaño"},{"name": "Joel Arias"}];
+  {
+    "name": "Luis Florez"
+  },
+  {
+    "name": "David Castaño"
+  }, {
+    "name": "Joel Arias"
+  }];
 app.get('/api', (req, res) => {
- res.send(base);
+  res.json(base);
 });
+app.post('/api/count',(req, res) => {
+  /* let data = {name: req.body.name}; */
+console.log(req.body);
 
-/* app.get('/api:id', (req, res) => {
-  res.send(base);
- }); */
-
-
+});
 
 /* var fs = require('fs');
 fs.readFile("server/counter.txt", "utf-8", (err: string, data: string) => {
