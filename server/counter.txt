@@ -1,2 +1,4 @@
 Pepito Pérez: 4
 Juanita Gómez: 10
+Luis Florez: 0
+David Ampudia: 0
