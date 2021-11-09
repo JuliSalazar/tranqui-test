@@ -12,67 +12,70 @@ type nameType = {
   count: number
 };
 
-var base: nameType[] = [
-  {
-    name: "Luis Florez",
-    count: 0
-  },
-  {
-    name: "David Ampudia",
-    count: 0
-  }, {
-    name: "Joel Arias",
-    count: 0
-  }];
+function getRandomNames() {
+  
+  var arrayNames = ["Luis Florez", "David Ampudia", "Joel Arias", "María Zambrano", "Juan Valencia", "Mateo Quintana", "Anthony Prieto", "William Escudero", "Christopher Bravo", "Roberto Calle", "Jayden Doe", "Andrew Smith", "Joseph Atilano", "Diana Brand"];
+  let jsonNamesArray: nameType[] = [];
+  for (let i = 0; i < Math.floor(Math.random() * (8 - 5 + 1) + 5); i++) {
+    var name = arrayNames[Math.floor(Math.random() * arrayNames.length)];
+    let element: nameType = { name: name, count: 0 }
+    jsonNamesArray[i] = element;
+
+  }
+  return jsonNamesArray;
+
+}
 
 app.get('/api', (req, res) => {
-  res.json(base);
+  res.json(getRandomNames());
 });
 
-app.post('/api/count', (req, res) => {
+app.post('/count', (req, res) => {
   let dataFromClient: nameType[] = req.body;
   let updatedData: string = "";
+  let dataFromClientString: string = "";
+  dataFromClient.map(({ name, count }) => {
+    return dataFromClientString += name + ": " + count + '\r\n';
+  })
 
   fs.readFile("server/counter.txt", "utf-8", (err: string, data: string) => {
     if (err) { console.log(err) }
-    let dataLines = data.split('\r\n');
+
+    let dataLines: string[] = data.split('\r\n');
+    let dataFromClientLines: string[] = dataFromClientString.split('\r\n');
+
+    dataFromClientLines.forEach(dataClientLine => {
+      let name: string = dataClientLine.split(": ")[0];
+      let count: number = parseInt(dataClientLine.split(": ")[1]);
+      if (data.match(name) === null) {
+        fs.appendFile('server/counter.txt', name + ": " + count + '\r\n', function (err: string) {
+          if (err) { console.log(err) }
+        })
+      }
+    });
+
     let changed: string = "";
-
-    let newName = false;
-
-    dataFromClient.forEach(element => {
-      let name: string = element.name;
-      let count: number = element.count;
-      console.log(count);
-      dataLines.forEach((line, index) => {
-
-//array filter? why only 6 updates
-        if (line.includes(name) && count.toString() !== line.split(': ')[1]) {
-
-          changed = line.replace(line.split(': ')[1], count.toString());
+    dataLines.forEach((line) => {
+      dataFromClientLines.forEach(dataClientLine => {
+        let name: string = dataClientLine.split(": ")[0];
+        let count: number = parseInt(dataClientLine.split(": ")[1]);
+        if (line.includes(name + ": " + (count - 1))) {
+          changed = line.replace(line, dataClientLine);
           updatedData = dataLines.join('\r\n').replace(line, changed);
           fs.writeFile('server/counter.txt', updatedData, function (err: string) {
             if (err) { console.log(err) }
-            console.log("Overwrited data");
+            return;
           })
-        } else if (line.split(': ')[0] !== name) {
-          console.log("DIF" + line);
 
-          /* fs.appendFile('server/counter.txt', name+": "+count+'\r\n', function (err: string) {
-            if (err) { console.log(err) }
-            console.log("New Data");
-          })  */
         }
       });
+
     });
-    /*  if(newName){
- 
-       
-     } */
 
   });
+  res.send("ok");
 });
 
 app.listen(port, () => {
-  console.log(`server started at http://localhost:${port}`);
+  console.log(`server started at http://localhost:${port}/api`);
 });

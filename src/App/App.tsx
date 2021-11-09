@@ -1,7 +1,6 @@
 import { Container, CssBaseline, Paper, Typography, ButtonGroup, Button } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { useEffect } from 'react';
-import { BrowserRouter, Link } from "react-router-dom";
 
 type nameType = {
   name: string,
@@ -19,50 +18,49 @@ function App() {
       setInitialNames(array);
     };
     loadInitialData();
-     
+    const refreshInterval = setInterval(loadInitialData, 5000);
+    return ()=>{
+      clearInterval(refreshInterval);
+    }
   }, []);
+
 
   const handleClick = (index: number) => {
 
     initialNames[index].count = initialNames[index].count + 1;
     const postData = async () => {
-      const response = await fetch(`/api/count`, {
+      const response = await fetch('/count', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(initialNames),
       })
-      return await console.log(response);
+      return await console.log(response.ok);
     }
     postData();
-    
-    console.log("clicked")
   }
 
   return (<>
-    <BrowserRouter>
-      <CssBaseline />
-      <Box bgcolor="#eeeeee" minHeight="100vh" p={4}>
-        <Container maxWidth="sm">
-          <Paper>
-            <Box p={4}>
-              <Typography variant="h4">People to click</Typography>
-              <ButtonGroup
-                orientation="vertical"
-                aria-label="vertical outlined button group"
-              >
+    <CssBaseline />
+    <Box bgcolor="#eeeeee" minHeight="100vh" p={4}>
+      <Container maxWidth="sm">
+        <Paper>
+          <Box p={4}>
+            <Typography variant="h4">People to click</Typography>
+            <ButtonGroup
+              orientation="vertical"
+              aria-label="vertical outlined button group"
+            >
 
-                {initialNames.map(({ name }, index) => {
-                  return (
-                    <Button key={index} variant="contained" color="primary" onClick={() => { handleClick(index) }}>{name}</Button>
-
-                  );
-                })}
-              </ButtonGroup>
-            </Box>
-          </Paper>
-        </Container>
-      </Box>
-    </BrowserRouter>
+              {initialNames.map(({ name }, index) => {
+                return (
+                  <Button key={index} color="primary" onClick={() => { handleClick(index) }}>{name}</Button>
+                );
+              })}
+            </ButtonGroup>
+          </Box>
+        </Paper>
+      </Container>
+    </Box>
   </>);
 }
 
